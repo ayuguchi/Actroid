@@ -110,6 +110,8 @@ RTC::ReturnCode_t Actroid::onShutdown(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Actroid::onActivated(RTC::UniqueId ec_id)
 {
   // Here for Actroid, open COM port and initialize each joints.
+  m_pActroid = new ogata_lab::ActroidBase(m_port.c_str());
+  m_currentJoint.data.length(NUM_JOINT);
   return RTC::RTC_OK;
 }
 
@@ -117,6 +119,7 @@ RTC::ReturnCode_t Actroid::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t Actroid::onDeactivated(RTC::UniqueId ec_id)
 {
   // Here, finalize (cleanup) Actroid.
+  delete m_pActroid;
   return RTC::RTC_OK;
 }
 
@@ -128,27 +131,26 @@ RTC::ReturnCode_t Actroid::onExecute(RTC::UniqueId ec_id)
   if (m_targetJointIn.isNew()) {
     m_targetJointIn.read();
     
+    for (uint i = 0;i < m_targetJoint.data.length();i++) {
+      m_pActroid->setTargetAngle(i, m_targetJoint.data[i]);
+    }
+    m_pActroid->updateTargetAngles();
+
     if(m_debug) {
       // Print out target command.
       std::cout << "Target is " << std::endl;
-      for (int i = 0;i < m_targetJoint.data.length();i++) {
+      for (uint i = 0;i < m_targetJoint.data.length();i++) {
 	std::cout << m_targetJoint.data[i] << ", ";
       }
       std::cout << std::endl;
-
-
-      
     }
-
   }
 
-
-  // int JOINT_NUM = 25????
-  // m_currentJoint.data.lenght(JOINT_NUM);
-  // for (int i = 0;i < JOINT_NUM;i++) {
-  //    m_currentJoint.data[i] = hoge;
-  // }
-  // m_currentJointOut.write();
+  m_pActroid->updateCurrentAngles();
+  for (int i = 0;i < NUM_JOINT;i++) {
+    m_currentJoint.data[i] = m_pActroid->getCurrentAngle(i);
+  }
+  m_currentJointOut.write();
   
   return RTC::RTC_OK;
 }

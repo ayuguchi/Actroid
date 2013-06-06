@@ -29,6 +29,9 @@
 
 // </rtc-template>
 
+
+#include "ActroidBase.h"
+
 using namespace RTC;
 
 /*!
@@ -289,6 +292,8 @@ class Actroid
   
   // </rtc-template>
 
+
+  ogata_lab::ActroidBase *m_pActroid;
 };
 
 

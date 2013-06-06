@@ -1,4 +1,4 @@
-set(hdrs Actroid.h
+set(hdrs Actroid.h ActroidBase.h SerialPort.h
     PARENT_SCOPE
     )
 

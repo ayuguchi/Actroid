@@ -1,4 +1,4 @@
-set(comp_srcs Actroid.cpp )
+set(comp_srcs Actroid.cpp ActroidBase.cpp SerialPort.cpp)
 set(standalone_srcs ActroidComp.cpp)
 
 if (DEFINED OPENRTM_INCLUDE_DIRS)
