@@ -109,18 +109,47 @@ RTC::ReturnCode_t Actroid::onShutdown(RTC::UniqueId ec_id)
 
 RTC::ReturnCode_t Actroid::onActivated(RTC::UniqueId ec_id)
 {
+  // Here for Actroid, open COM port and initialize each joints.
   return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Actroid::onDeactivated(RTC::UniqueId ec_id)
 {
+  // Here, finalize (cleanup) Actroid.
   return RTC::RTC_OK;
 }
 
 
 RTC::ReturnCode_t Actroid::onExecute(RTC::UniqueId ec_id)
 {
+  // Here, periodically called method is placed.
+
+  if (m_targetJointIn.isNew()) {
+    m_targetJointIn.read();
+    
+    if(m_debug) {
+      // Print out target command.
+      std::cout << "Target is " << std::endl;
+      for (int i = 0;i < m_targetJoint.data.length();i++) {
+	std::cout << m_targetJoint.data[i] << ", ";
+      }
+      std::cout << std::endl;
+
+
+      
+    }
+
+  }
+
+
+  // int JOINT_NUM = 25????
+  // m_currentJoint.data.lenght(JOINT_NUM);
+  // for (int i = 0;i < JOINT_NUM;i++) {
+  //    m_currentJoint.data[i] = hoge;
+  // }
+  // m_currentJointOut.write();
+  
   return RTC::RTC_OK;
 }
 
