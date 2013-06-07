@@ -26,7 +26,7 @@ static const char* actroid_spec[] =
     "lang_type",         "compile",
     // Configuration variables
     "conf.default.debug", "1",
-    "conf.default.port", "COM1",
+    "conf.default.port", "COM4",
     // Widget
     "conf.__widget__.debug", "text",
     "conf.__widget__.port", "text",

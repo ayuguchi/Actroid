@@ -93,6 +93,10 @@ void ActroidBase::_writePacket(const uint8_t* packet, const int len) throw(Actro
   }
 
   uint8_t ack;
+  while(m_pSerialPort->getSizeInRxBuffer() < 1) {
+	  Sleep(1);
+  }
+
   m_pSerialPort->read(&ack, 1);
   if (ack != _ack) {
     throw ActroidException("Nack received.");
@@ -102,6 +106,9 @@ void ActroidBase::_writePacket(const uint8_t* packet, const int len) throw(Actro
 void ActroidBase::_readRawAngle() throw(ActroidException)
 {
   _writePacket(joint_read_command, 5);
+  while(m_pSerialPort->getSizeInRxBuffer() < NUM_JOINT+1) {
+	  Sleep(10);
+  }
   m_pSerialPort->read(m_CurrentRawAngle, NUM_JOINT+1);
   if(m_CurrentRawAngle[0] != 24) {
     throw ActroidException("Invalid Joint Angle Packet Received.");
@@ -128,7 +135,7 @@ void ActroidBase::_writeRawAngle() throw(ActroidException)
 
 void ActroidBase::setTargetAngle(const int index, const double angle)
 {
-  m_TargetRawAngle[index] = (angle-_MinAngle[index])/(_MaxAngle[index]-_MinAngle[index]) * 255.0 + _DefaultRawAngle[index];
+  m_TargetRawAngle[index] = (angle)/(_MaxAngle[index]-_MinAngle[index]) * 255.0 + _DefaultRawAngle[index];
 }
 
 double ActroidBase::getCurrentAngle(const int index)
