@@ -131,7 +131,7 @@ RTC::ReturnCode_t Actroid::onExecute(RTC::UniqueId ec_id)
   if (m_targetJointIn.isNew()) {
     m_targetJointIn.read();
     
-    for (uint i = 0;i < m_targetJoint.data.length();i++) {
+    for (uint32_t i = 0;i < m_targetJoint.data.length();i++) {
       m_pActroid->setTargetAngle(i, m_targetJoint.data[i]);
     }
     m_pActroid->updateTargetAngles();
@@ -139,7 +139,7 @@ RTC::ReturnCode_t Actroid::onExecute(RTC::UniqueId ec_id)
     if(m_debug) {
       // Print out target command.
       std::cout << "Target is " << std::endl;
-      for (uint i = 0;i < m_targetJoint.data.length();i++) {
+      for (uint32_t i = 0;i < m_targetJoint.data.length();i++) {
 	std::cout << m_targetJoint.data[i] << ", ";
       }
       std::cout << std::endl;

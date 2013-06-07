@@ -23,7 +23,8 @@
 #ifdef _LIB
 #define LIBYSUGA_API
 #else
-#define LIBYSUGA_API __declspec(dllimport)
+#define LIBYSUGA_API
+//__declspec(dllimport)
 #endif // ifdef _LIB                                                                                                                                                                 
 #endif // ifdef LIBYSUGA_STATIC_EXPORTS                                                                                                                                              
 #endif // ifdef LIBYSUGA_EXPORTS                                                                                                                                                     
