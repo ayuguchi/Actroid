@@ -135,11 +135,12 @@ void ActroidBase::_writeRawAngle() throw(ActroidException)
 
 void ActroidBase::setTargetAngle(const int index, const double angle)
 {
-  m_TargetRawAngle[index] = (angle)/(_MaxAngle[index]-_MinAngle[index]) * 255.0 + _DefaultRawAngle[index];
+  m_TargetRawAngle[index] = angle;
+  //m_TargetRawAngle[index] = (angle)/(_MaxAngle[index]-_MinAngle[index]) * 255.0 + _DefaultRawAngle[index];
 }
 
 double ActroidBase::getCurrentAngle(const int index)
 {
-  return (m_CurrentRawAngle[index]-_DefaultRawAngle[index])/255.0 
-  * (_MaxAngle[index]-_MinAngle[index]) + _MinAngle[index];
+  return getCurrentAngle(index);
+  //return (m_CurrentRawAngle[index]-_DefaultRawAngle[index])/255.0 * (_MaxAngle[index]-_MinAngle[index]) + _MinAngle[index];
 }
