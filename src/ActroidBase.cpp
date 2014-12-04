@@ -14,6 +14,7 @@
 #define _USE_MATH_DEFINES
 #endif
 #include <math.h>
+#include <iostream>
 
 using namespace ogata_lab;
 using namespace net::ysuga;
@@ -38,30 +39,30 @@ static const uint8_t joint_read_command[] = {_start, _get, 0, _num_joint, _stop}
 
 static const double _MaxAngle[NUM_JOINT] = {
   M_PI, M_PI, M_PI, M_PI, M_PI,
-  M_PI, M_PI, M_PI, M_PI, M_PI,
+  M_PI, M_PI, M_PI, 2.27, 0.99,
 
-  M_PI, M_PI, M_PI, M_PI, M_PI,
-  M_PI, M_PI, M_PI, M_PI, M_PI,
+  1.57, 1.96, 1.57, 0.50, 0.45,
+  2.27, 0.99, 1.57, 1.96, 1.57,
 
   M_PI, M_PI, M_PI, M_PI,
 };
 
 static const double _MinAngle[NUM_JOINT] = {
   -M_PI, -M_PI, -M_PI, -M_PI, -M_PI,
-  -M_PI, -M_PI, -M_PI, -M_PI, -M_PI,
+  -M_PI, -M_PI, -M_PI, -0.24, 0.00,
 
-  -M_PI, -M_PI, -M_PI, -M_PI, -M_PI,
-  -M_PI, -M_PI, -M_PI, -M_PI, -M_PI,
+  0.00, 0.00, -1.57, -0.70, -0.27,
+  -0.24, 0.00, 0.00, 0.00, -1.57,
 
   -M_PI, -M_PI, -M_PI, -M_PI
 };
 
 static const uint8_t _DefaultRawAngle[NUM_JOINT] = {
   DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE,
-  DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE,
+  DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, 143, 86,
 
-  DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE,
-  DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE,
+  128, 218, 128, 128, 128,
+  113, 210, 0, 0, 0,
 
   DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE
 };
@@ -73,7 +74,7 @@ ActroidBase::ActroidBase(const char* portName) throw(ActroidException)
 
   m_CurrentRawAngle[0] = 0;
   for (int i = 0;i < NUM_JOINT;i++) {
-    m_CurrentRawAngle[i + 1] = _DefaultRawAngle[i];
+    m_CurrentRawAngle[i+1] = _DefaultRawAngle[i];
     m_TargetRawAngle[i] = _DefaultRawAngle[i];
   }
 
@@ -135,12 +136,27 @@ void ActroidBase::_writeRawAngle() throw(ActroidException)
 
 void ActroidBase::setTargetAngle(const int index, const double angle)
 {
-  m_TargetRawAngle[index] = angle;
   //m_TargetRawAngle[index] = (angle)/(_MaxAngle[index]-_MinAngle[index]) * 255.0 + _DefaultRawAngle[index];
+  m_TargetRawAngle[index] = (angle)/(_MaxAngle[index]-_MinAngle[index]) * 255.0 - (_MinAngle[index] * 255.0 / (_MaxAngle[index]-_MinAngle[index]));
+//  if (index == 15)
+//   {
+//    std::cout << "TargetRawAngle is  " << static_cast<int>(m_TargetRawAngle[15]) << std::endl;
+//	  std::cout << "_MaxAngle[15] is  " << static_cast<int>(_MaxAngle[15]) << std::endl;
+//	  std::cout << "_MinAngle[15] is  " << static_cast<int>(_MinAngle[15]) << std::endl;
+//	  std::cout << "_DefaultRawAngle[15] is  " << static_cast<int>(_DefaultRawAngle[15]) << std::endl;
+//	  std::cout << "angle is  " << angle << std::endl;
+//   }
 }
 
 double ActroidBase::getCurrentAngle(const int index)
 {
-  return getCurrentAngle(index);
   //return (m_CurrentRawAngle[index]-_DefaultRawAngle[index])/255.0 * (_MaxAngle[index]-_MinAngle[index]) + _MinAngle[index];
+//  if (index == 15)
+//   {
+//    std::cout << "m_CurrentRawAngle[15] is  " << static_cast<int>(m_CurrentRawAngle[15]) << std::endl;
+//	std::cout << "_MaxAngle[15] is  " << static_cast<int>(_MaxAngle[15]) << std::endl;
+//	std::cout << "_MinAngle[15] is  " << static_cast<int>(_MinAngle[15]) << std::endl;
+//   }
+  return (m_CurrentRawAngle[index+1] * (_MaxAngle[index]-_MinAngle[index]))/255.0 + _MinAngle[index];
+
 }

@@ -26,7 +26,7 @@ static const char* actroid_spec[] =
     "lang_type",         "compile",
     // Configuration variables
     "conf.default.debug", "1",
-    "conf.default.port", "COM4",
+    "conf.default.port", "COM9",
     // Widget
     "conf.__widget__.debug", "text",
     "conf.__widget__.port", "text",
@@ -136,20 +136,22 @@ RTC::ReturnCode_t Actroid::onExecute(RTC::UniqueId ec_id)
     }
     m_pActroid->updateTargetAngles();
 
-    if(m_debug) {
+    //if(m_debug) {
       // Print out target command.
-      std::cout << "Target is " << std::endl;
-      for (uint32_t i = 0;i < m_targetJoint.data.length();i++) {
-	std::cout << m_targetJoint.data[i] << ", ";
-      }
-      std::cout << std::endl;
-    }
+      //std::cout << "Target is " << std::endl;
+      //for (uint32_t i = 0;i < m_targetJoint.data.length();i++) {
+	//std::cout << m_targetJoint.data[i] << ", ";
+      //}
+      //std::cout << std::endl;
+    //}
   }
 
   m_pActroid->updateCurrentAngles();
   for (int i = 0;i < NUM_JOINT;i++) {
     m_currentJoint.data[i] = m_pActroid->getCurrentAngle(i);
   }
+  setTimestamp<RTC::TimedDoubleSeq>(m_currentJoint);
+ 
   m_currentJointOut.write();
   
   return RTC::RTC_OK;
