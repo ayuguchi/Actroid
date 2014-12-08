@@ -98,7 +98,9 @@ namespace ogata_lab {
     /**
      *
      */
-    uint8_t getTargetRawAngle(const int index) {return m_TargetRawAngle[index];}
+    uint8_t getTargetRawAngle(const int index) {
+		return m_TargetRawAngle[index];
+	}
 
     /**
      *

@@ -67,6 +67,15 @@ static const uint8_t _DefaultRawAngle[NUM_JOINT] = {
   DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE
 };
 
+static const double _AngleMargin[NUM_JOINT] = {
+	0.001, 0.001, 0.001, 0.001, 0.001,
+	0.001, 0.001, 0.001, 0.040, 0.001,
+	0.001, 0.001, 0.001, 0.001, 0.001,
+	0.001, 0.001, 0.001, 0.001, 0.001,
+	0.001, 0.001, 0.001, 0.001
+
+};
+
 ActroidBase::ActroidBase(const char* portName) throw(ActroidException)
 {
   m_pSerialPort = new SerialPort(portName, BAUDRATE);
@@ -137,7 +146,13 @@ void ActroidBase::_writeRawAngle() throw(ActroidException)
 void ActroidBase::setTargetAngle(const int index, const double angle)
 {
   //m_TargetRawAngle[index] = (angle)/(_MaxAngle[index]-_MinAngle[index]) * 255.0 + _DefaultRawAngle[index];
-  m_TargetRawAngle[index] = (angle)/(_MaxAngle[index]-_MinAngle[index]) * 255.0 - (_MinAngle[index] * 255.0 / (_MaxAngle[index]-_MinAngle[index]));
+	if(angle >= (_MaxAngle[index]-_AngleMargin[index])) {
+		const double angle = _MaxAngle[index] - _AngleMargin[index];
+	} else if(angle <= (_MinAngle[index] + _AngleMargin[index])) {
+		const double angle = _MinAngle[index] + _AngleMargin[index];
+	}
+
+  m_TargetRawAngle[index] = (angle) * 255.0/(_MaxAngle[index]-_MinAngle[index]) - (_MinAngle[index] * 255.0 / (_MaxAngle[index]-_MinAngle[index]));
 //  if (index == 15)
 //   {
 //    std::cout << "TargetRawAngle is  " << static_cast<int>(m_TargetRawAngle[15]) << std::endl;
@@ -154,7 +169,7 @@ double ActroidBase::getCurrentAngle(const int index)
 //  if (index == 15)
 //   {
 //    std::cout << "m_CurrentRawAngle[15] is  " << static_cast<int>(m_CurrentRawAngle[15]) << std::endl;
-//	std::cout << "_MaxAngle[15] is  " << static_cast<int>(_MaxAngle[15]) << std::endl;
+// 	std::cout << "_MaxAngle[15] is  " << static_cast<int>(_MaxAngle[15]) << std::endl;
 //	std::cout << "_MinAngle[15] is  " << static_cast<int>(_MinAngle[15]) << std::endl;
 //   }
   return (m_CurrentRawAngle[index+1] * (_MaxAngle[index]-_MinAngle[index]))/255.0 + _MinAngle[index];
