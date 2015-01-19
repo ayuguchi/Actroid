@@ -89,7 +89,6 @@ ActroidBase::ActroidBase(const char* portName) throw(ActroidException)
 
 }
 
-
 ActroidBase::~ActroidBase() throw(ActroidException)
 {
   _writePacket(offline_command, 3);
