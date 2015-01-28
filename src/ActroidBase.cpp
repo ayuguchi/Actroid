@@ -37,25 +37,50 @@ static const uint8_t online_command[] = {_start, _online, _stop};
 static const uint8_t offline_command[] = {_start, _online, _stop};
 static const uint8_t joint_read_command[] = {_start, _get, 0, _num_joint, _stop};
 
+
+#define RADIANS(x) ((x)/180.0*M_PI)
+
+/*
 static const double _MaxAngle[NUM_JOINT] = {
-  M_PI, M_PI, M_PI, M_PI, M_PI,
-  M_PI, M_PI, M_PI, 2.27, 0.99,
-
-  1.57, 1.96, 1.57, 0.50, 0.45,
-  2.27, 0.99, 1.57, 1.96, 1.57,
-
-  M_PI, M_PI, M_PI, M_PI,
+  RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255),
+  RADIANS(120.0), RADIANS(58), RADIANS(45), RADIANS(112.312+14.497), RADIANS(90.0), RADIANS(25.833), RADIANS(28.423),
+  RADIANS(120.0), RADIANS(58), RADIANS(45), RADIANS(112.312+14.497), RADIANS(90.0), RADIANS(25.833), RADIANS(28.423),
+  RADIANS(255), RADIANS(255)
 };
+*/
+
+static const double _MaxAngle[NUM_JOINT] = {
+  RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255), RADIANS(255),
+  RADIANS(120.0), RADIANS(58), RADIANS(45), RADIANS(140), RADIANS(90.0), RADIANS(25.833), RADIANS(28.423),
+  RADIANS(120.0), RADIANS(58), RADIANS(45), RADIANS(140), RADIANS(90.0), RADIANS(25.833), RADIANS(28.423),
+  RADIANS(255), RADIANS(255)
+};
+
+/*
+static const double _MinAngle[NUM_JOINT] = {
+  RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0),
+  RADIANS(-14.0), RADIANS(-15.0), RADIANS(-45.0), RADIANS(14.497), RADIANS(-65.0), RADIANS(-15.458), RADIANS(-39.876),
+  RADIANS(-14.0), RADIANS(-15.0), RADIANS(-45.0), RADIANS(14.497), RADIANS(-65.0), RADIANS(-15.458), RADIANS(-39.876),
+  RADIANS(0), RADIANS(0)
+};
+*/
+
 
 static const double _MinAngle[NUM_JOINT] = {
-  -M_PI, -M_PI, -M_PI, -M_PI, -M_PI,
-  -M_PI, -M_PI, -M_PI, -0.24, 0.00,
-
-  0.00, 0.00, -1.57, -0.70, -0.27,
-  -0.24, 0.00, 0.00, 0.00, -1.57,
-
-  -M_PI, -M_PI, -M_PI, -M_PI
+  RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(0),
+  RADIANS(-18.0), RADIANS(-15.0), RADIANS(-45.0), RADIANS(20), RADIANS(-65.0), RADIANS(-15.458), RADIANS(-39.876),
+  RADIANS(-18.0), RADIANS(-15.0), RADIANS(-45.0), RADIANS(20), RADIANS(-65.0), RADIANS(-15.458), RADIANS(-39.876),
+  RADIANS(0), RADIANS(0)
 };
+
+static const double _DefaultAngle[NUM_JOINT] = {
+  RADIANS(128), RADIANS(128), RADIANS(128), RADIANS(128), 
+  RADIANS(0), RADIANS(128), RADIANS(128), RADIANS(128),
+  RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(90),  RADIANS(0), RADIANS(0), RADIANS(0),
+  RADIANS(0), RADIANS(0), RADIANS(0), RADIANS(90),  RADIANS(0), RADIANS(0), RADIANS(0),
+  RADIANS(0), RADIANS(128)
+};
+
 
 static const uint8_t _DefaultRawAngle[NUM_JOINT] = {
   DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE, DEFAULT_RAW_ANGLE,
@@ -68,11 +93,10 @@ static const uint8_t _DefaultRawAngle[NUM_JOINT] = {
 };
 
 static const double _AngleMargin[NUM_JOINT] = {
-	0.001, 0.001, 0.001, 0.001, 0.001,
-	0.001, 0.001, 0.001, 0.040, 0.040,
-	0.001, 0.001, 0.001, 0.001, 0.001,
-	0.001, 0.001, 0.001, 0.001, 0.001,
-	0.001, 0.001, 0.001, 0.001
+	0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 
+	0.040, 0.040, 0.001, 0.1, 0.001, 0.001, 0.001,
+	0.001, 0.001, 0.001, 0.05, 0.001, 0.001, 0.001,
+	0.001, 0.001
 
 };
 
@@ -84,7 +108,8 @@ ActroidBase::ActroidBase(const char* portName) throw(ActroidException)
   m_CurrentRawAngle[0] = 0;
   for (int i = 0;i < NUM_JOINT;i++) {
     m_CurrentRawAngle[i+1] = _DefaultRawAngle[i];
-    m_TargetRawAngle[i] = _DefaultRawAngle[i];
+    //m_TargetRawAngle[i] = _DefaultRawAngle[i];
+	setTargetAngle(i, _DefaultAngle[i]);
   }
 
 }
@@ -142,13 +167,13 @@ void ActroidBase::_writeRawAngle() throw(ActroidException)
   _writePacket(command, NUM_JOINT+5);
 }
 
-void ActroidBase::setTargetAngle(const int index, const double angle)
+void ActroidBase::setTargetAngle(const int index, double angle)
 {
   //m_TargetRawAngle[index] = (angle)/(_MaxAngle[index]-_MinAngle[index]) * 255.0 + _DefaultRawAngle[index];
 	if(angle >= (_MaxAngle[index]-_AngleMargin[index])) {
-		const double angle = _MaxAngle[index] - _AngleMargin[index];
+		 angle = _MaxAngle[index] - _AngleMargin[index];
 	} else if(angle <= (_MinAngle[index] + _AngleMargin[index])) {
-		const double angle = _MinAngle[index] + _AngleMargin[index];
+		 angle = _MinAngle[index] + _AngleMargin[index];
 	}
 
   m_TargetRawAngle[index] = (angle) * 255.0/(_MaxAngle[index]-_MinAngle[index]) - (_MinAngle[index] * 255.0 / (_MaxAngle[index]-_MinAngle[index]));

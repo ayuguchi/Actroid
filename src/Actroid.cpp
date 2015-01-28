@@ -26,10 +26,11 @@ static const char* actroid_spec[] =
     "lang_type",         "compile",
     // Configuration variables
     "conf.default.debug", "1",
-    "conf.default.port", "COM9",
+    "conf.default.port", "COM2",
     // Widget
     "conf.__widget__.debug", "text",
     "conf.__widget__.port", "text",
+	"exec_cxt.periodic.rate", "10",
     // Constraints
     ""
   };
@@ -112,6 +113,11 @@ RTC::ReturnCode_t Actroid::onActivated(RTC::UniqueId ec_id)
   // Here for Actroid, open COM port and initialize each joints.
   m_pActroid = new ogata_lab::ActroidBase(m_port.c_str());
   m_currentJoint.data.length(NUM_JOINT);
+
+  //for (uint32_t i = 0;i < NUM_JOINT;i++) {
+   // m_pActroid->setTargetAngle(i, 0);
+  //}
+  m_pActroid->updateTargetAngles();
   return RTC::RTC_OK;
 }
 
@@ -135,15 +141,6 @@ RTC::ReturnCode_t Actroid::onExecute(RTC::UniqueId ec_id)
       m_pActroid->setTargetAngle(i, m_targetJoint.data[i]);
     }
     m_pActroid->updateTargetAngles();
-
-    //if(m_debug) {
-      // Print out target command.
-      //std::cout << "Target is " << std::endl;
-      //for (uint32_t i = 0;i < m_targetJoint.data.length();i++) {
-	//std::cout << m_targetJoint.data[i] << ", ";
-      //}
-      //std::cout << std::endl;
-    //}
   }
 
   m_pActroid->updateCurrentAngles();

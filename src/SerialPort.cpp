@@ -173,10 +173,24 @@ int SerialPort::getSizeInRxBuffer()
 int SerialPort::write(const void* src, const unsigned int size)
 {
 #ifdef WIN32
-	DWORD WrittenBytes;
+	DWORD WrittenBytes = 0;
+	DWORD Buf;
+
+	unsigned char* dat = (unsigned char*)src;
+	
 	if(!WriteFile(m_hComm, src, size, &WrittenBytes, NULL)) {
 		throw ComAccessException();
 	}
+	/*
+	for(unsigned int i = 0;i < size;i++) {
+		if(!WriteFile(m_hComm, dat+i, 1, &Buf, NULL)) {
+			throw ComAccessException();
+		}
+		Sleep(1);
+		WrittenBytes += Buf;
+	}
+
+	*/
 
 	return WrittenBytes;
 #else

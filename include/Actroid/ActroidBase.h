@@ -105,7 +105,7 @@ namespace ogata_lab {
     /**
      *
      */
-    void setTargetAngle(const int index, const double angle);
+    void setTargetAngle(const int index, double angle);
 
     double getCurrentAngle(const int index);
 
